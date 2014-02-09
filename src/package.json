@@ -1,0 +1,57 @@
+{
+  "name": "perldocjp-firefox-addon",
+  "icon64": "data/perldocjp.png",
+  "icon": "data/favicon.ico",
+  "fullName": "perldocjp-firefox-addon",
+  "id": "jid1-ksqk4f5Z7TzgZQ",
+  "description": "perldoc.jp 翻訳通知",
+  "author": "ktat",
+  "license": "MPL 2.0",
+  "version": "0.1",
+  "preferences": [
+                  {
+                      "name": "howto_notify",
+                      "title": "通知方法",
+                      "type": "menulist",
+                      "value": "1",
+                      "options": [
+                      {
+                        "value": "1",
+                        "label": "popup"
+                      },
+                      {
+                        "value": "2",
+                        "label": "desktop"
+                      }
+                      ]
+                  },
+                  {
+                      "name": "notify_everytime",
+                      "title": "毎回通知する",
+                      "description": "通知を毎回行うかどうか",
+                      "type": "bool",
+                      "value": true
+                  },
+                  {
+                      "name": "notify_timeout",
+                      "title": "通知表示秒数",
+                      "description": "指定された秒数の後、通知が消えます。0の場合、通知しません。",
+                      "type": "integer",
+                      "value": 5
+                  },
+                  {
+                      "name": "notify_and_open",
+                      "title": "自動的にPerldoc.jpの翻訳ページを開く",
+                      "description": "該当のページがある場合、自動的に翻訳ページを開きます",
+                      "type": "bool",
+                      "value": false
+                  },
+                  {
+                      "name": "prefs_submit",
+                      "title": "反映",
+                      "label": "反映",
+                      "description": "設定を有効にします",
+                      "type": "control"
+                  }
+                  ]
+}
