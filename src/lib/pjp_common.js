@@ -2,7 +2,7 @@
 
 function get_doc_name (tab) {
   var doc_name = '';
-  if (! tab)  return;
+  if (! tab || ! tab.url)  return;
 
   if(tab.url.match(/^https?:\/\/perldoc\.perl\.org\/search\.html\?q=(.+)/)) {
     var q = RegExp.$1;
@@ -49,8 +49,8 @@ function get_doc_name (tab) {
 
 // copy & modify from chrom extension
 function get_perldocjp_url (doc_name, perldocjp_db) {
-console.log(doc_name);
-console.log(perldocjp_db);
+// console.log(doc_name);
+// console.log(perldocjp_db);
   if (doc_name && doc_name.match(/^([\w:]+)/)) {
     var module = RegExp.$1;
     var perldocjp_path = perldocjp_db[module];

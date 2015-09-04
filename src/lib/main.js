@@ -2,12 +2,12 @@ var debug = 1;
 
 var notifications = require("sdk/notifications");
 var data          = require("sdk/self").data;
-var widgets       = require("sdk/widget");
+var ui            = require("sdk/ui");
 var tabs          = require("sdk/tabs");
 var ss            = require("sdk/simple-storage");
-var timers        = require('timers');
+var timers        = require('sdk/timers');
 var pageMod       = require("sdk/page-mod");
-var common        = require('pjp_common.js');
+var common        = require('lib/pjp_common.js');
 var prefs         = require("sdk/simple-prefs");
 
 var notified = {};
@@ -29,7 +29,7 @@ function make_toolbarbutton (options) {
     id: "perldocjp-button",
     label: "perldoc.jp",
     tooltiptext: "move to perldoc.jp",
-    image: data.url("perldocjp_off.png"),
+    image: "./perldocjp_off.png",
     onCommand: open_pjp
   });
   if (debug || (options.loadReason == 'install')) {
@@ -40,10 +40,11 @@ function make_toolbarbutton (options) {
   }
 }
 
-var widget = widgets.Widget({
-  id: "perldoc.jp-link",
+var widget = ui.ActionButton({
+  id: "perldocjp-link",
+  icon: "./favicon.ico",
   label: "Perldoc.jp Website",
-  contentURL: data.url("widget_off.html"),
+  contentURL: "./widget_off.html",
   onClick: open_pjp
 });
 
@@ -55,7 +56,7 @@ exports.main = function (options) {
 function start () {
   changePref();
   if (ss.storage.perldocjp_db) {
-    prefs.on("prefs_submit" , onPrefChange);
+    prefs.on("" , onPrefChange);
     setPageMod();
     setEvents();
     timers.setTimeout(updatePerldocJpDb, 3600);
@@ -70,14 +71,16 @@ function setEvents () {
     var pjp_url = common.get_perldocjp_url(doc_name, ss.storage.perldocjp_db);
     if (pjp_url) {
       if (button)
-	button.image = data.url("perldocjp_on.png");
+	button.image = "./perldocjp_on.png";
       if (widget)
-	widget.contentURL = data.url("widget_on.html");
+        widget.icon = "./perldocjp_on.png";
+	widget.contentURL = "./widget_on.html";
     } else {
       if (button)
-	button.image = data.url("perldocjp_off.png");
+	button.image = "./perldocjp_off.png";
       if (widget)
-	widget.contentURL = data.url("widget_off.html");
+        widget.icon = "./perldocjp_off.png";
+	widget.contentURL = "./widget_off.html";
     }
   };
 
@@ -104,6 +107,7 @@ function updatePerldocJpDb (fn) {
 function checkSameUrl (url) {
   var found = false;
   for each (var tab in tabs) {
+
     if (tab.url == url) {
       found = true;
     }
@@ -122,12 +126,12 @@ function setPageMod () {
       "https://metacpan.org/*"
     ],
     contentScriptWhen: 'ready',
-    contentScriptFile: data.url('pagemod.js'),
+    contentScriptFile: './pagemod.js',
     onAttach: function onAttach(worker) {
       var doc_name = common.get_doc_name(worker.tab);
       var pjp_url  = common.get_perldocjp_url(doc_name, ss.storage.perldocjp_db);
       if (pjp_url) {
-	widget.contentURL = data.url("widget_on.html");
+	widget.contentURL = "./widget_on.html";
 	if ((ss.storage.notify_everytime || ! notified[pjp_url]) && ss.storage.notify_timeout > 0) {
 	  notified[pjp_url] = true;
 	  if (ss.storage.howto_notify == "2") {
@@ -135,7 +139,7 @@ function setPageMod () {
               title: "Perldoc.jp 翻訳通知",
               text: doc_name + "の翻訳が見つかりました",
               data: pjp_url,
-	      iconURL: data.url('perldocjp.png'),
+	      iconURL: './perldocjp.png',
               onClick: function (data) {
                 tabs.open(pjp_url);
               }
@@ -153,11 +157,22 @@ function setPageMod () {
 }
 
 function onPrefChange(prefName) {
-  console.log(prefs.prefs.howto_notify);
-  ss.storage.howto_notify     = prefs.prefs.howto_notify;
-  ss.storage.notify_everytime = prefs.prefs.notify_everytime;
-  ss.storage.notify_timeout   = prefs.prefs.notify_timeout  ;
-  ss.storage.notify_and_open  = prefs.prefs.notify_and_open ;
+  // console.log(prefs.prefs);
+  if (prefName === 'howto_notify_popup' && prefs.prefs['howto_notify_popup'] === true) {
+      ss.storage.howto_notify = 1;
+      prefs.prefs['howto_notify_desktop'] = false;
+  } else if (prefName === 'howto_notify_desktop' && prefs.prefs['howto_notify_desktop'] === true) {
+      ss.storage.howto_notify = 2;
+      prefs.prefs['howto_notify_popup'] = false;
+  } else if (prefs.prefs['howto_notify_popup']) {
+      prefs.prefs['howto_notify_desktop'] = false;
+  } else if (prefs.prefs['howto_notify_desktop']) {
+      prefs.prefs['howto_notify_popup'] = false;
+  }
+
+  ss.storage.notify_everytime = prefs.prefs['notify_everytime'];
+  ss.storage.notify_timeout   = prefs.prefs['notify_timeout']  ;
+  ss.storage.notify_and_open  = prefs.prefs['notify_and_open'] ;
 }
 
 function changePref() {
@@ -167,9 +182,20 @@ function changePref() {
     ss.storage.notify_timeout   = 5;
     ss.storage.notify_and_open  = false;
   }
-  prefs.prefs.howto_notify     = ss.storage.howto_notify     || '1';
-  prefs.prefs.notify_everytime = ss.storage.notify_everytime || true;
-  prefs.prefs.notify_timeout   = ss.storage.notify_timeout   || 8;
-  prefs.prefs.notify_and_open  = ss.storage.notify_and_open  || false;
-  prefs.prefs.notify_timeout
+
+  if (ss.storage.howto_notify === "2") {
+    prefs.prefs['howto_notify'] = "2";
+    prefs.prefs['howto_notify_desktop'] = true;
+    prefs.prefs['howto_notify_popup'] = false;
+  } else {
+    prefs.prefs['howto_notify'] = "1";
+    prefs.prefs['howto_notify_desktop'] = false;
+    prefs.prefs['howto_notify_popup'] = true;
+  }
+
+  prefs.prefs['notify_everytime'] = ss.storage.notify_everytime || true;
+  prefs.prefs['notify_timeout']   = ss.storage.notify_timeout   || 8;
+  prefs.prefs['notify_and_open']  = ss.storage.notify_and_open  || false;
+  prefs.prefs['notify_timeout']
 }
+

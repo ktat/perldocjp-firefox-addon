@@ -1,29 +1,30 @@
 {
-  "name": "perldocjp-firefox-addon",
-  "icon64": "data/perldocjp.png",
-  "icon": "data/favicon.ico",
-  "fullName": "perldocjp-firefox-addon",
-  "id": "jid1-ksqk4f5Z7TzgZQ",
+  "id": "jid1-ksqk4f5Z7TzgZQ@jetpack",
+  "title": "perldocjp translation notifier",
+  "name": "perldocjp-translation-notifier",
+  "icon64": "./data/perldocjp.png",
+  "icon": "./data/favicon.ico",
+  "version": "0.1.2",
   "description": "perldoc.jp 翻訳通知",
+  "main": "lib/main.js",
   "author": "ktat",
-  "license": "MPL 2.0",
-  "version": "0.1",
+  "engines": {
+    "firefox": ">=38.0a1",
+    "fennec": ">=38.0a1"
+  },
+  "license": "MIT",
   "preferences": [
                   {
-                      "name": "howto_notify",
-                      "title": "通知方法",
-                      "type": "menulist",
-                      "value": "1",
-                      "options": [
-                      {
-                        "value": "1",
-                        "label": "popup"
-                      },
-                      {
-                        "value": "2",
-                        "label": "desktop"
-                      }
-                      ]
+                      "name": "howto_notify_popup",
+                      "title": "ポップアップ通知",
+                      "type": "bool",
+                      "value": true
+                  },
+                  {
+                      "name": "howto_notify_desktop",
+                      "title": "デスクトップ通知",
+                      "type": "bool",
+                      "value": false
                   },
                   {
                       "name": "notify_everytime",
@@ -45,13 +46,6 @@
                       "description": "該当のページがある場合、自動的に翻訳ページを開きます",
                       "type": "bool",
                       "value": false
-                  },
-                  {
-                      "name": "prefs_submit",
-                      "title": "反映",
-                      "label": "反映",
-                      "description": "設定を有効にします",
-                      "type": "control"
                   }
                   ]
 }

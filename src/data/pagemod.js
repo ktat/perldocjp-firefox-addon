@@ -1,12 +1,14 @@
 self.port.on('showNotification', function (args) {
-  var pjp_doc_name = args[0];
-  var pjp_url      = args[1];
-  var pjp_timeout  = args[2];
+  var replacements = { "&": "&amp;", '"': "&quot;", "<": "&lt;", ">": "&gt;" };
+
+  var pjp_doc_name = String(args[0]).replace(/[&"<>]/g, function (m) {replacements[m]});
+  var pjp_url      = String(args[1]).replace(/[&"<>]/g, function (m) {replacements[m]});
+  var pjp_timeout  = String(args[2]).replace(/[&"<>]/g, function (m) {replacements[m]});
 
   var pjp_link = document.createElement("a");
   pjp_link.href      = pjp_url;
   pjp_link.target    = "_blank";
-  pjp_link.innerHTML = pjp_doc_name + ' の翻訳へ';
+  pjp_link.text      = pjp_doc_name + ' の翻訳へ';
   pjp_link.style     = 'text-decoration: none';
 
   var pjp_info = document.querySelector("#perldocjp_notification");
